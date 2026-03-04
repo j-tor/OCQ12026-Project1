@@ -20,7 +20,7 @@ bool MipsDisplay::OnUserCreate()
 
 bool MipsDisplay::OnUserDestroy()
 { 
-    return false; 
+    return true; 
 }
 
 bool MipsDisplay::OnUserUpdate(float fElapsedTime)

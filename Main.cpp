@@ -2,7 +2,7 @@
 #include "MipsDisplay.hpp"
 #include <memory>
 
-static std::unique_ptr<MipsDisplay> gDisplay;
+static MipsDisplay* gDisplay = nullptr;
 
 extern "C"
 #ifdef _WIN32
@@ -12,20 +12,18 @@ ErrorCode handleSyscall(uint32_t* regs, void* mem, MemoryMap* mem_map)
 {
     (void)mem;
     (void)mem_map;
-
+    
     switch (regs[Register::v0])
     {
-        // 100 - Start Engine
-        case 100:
+        case 100:  // Start Engine
             if (!gDisplay)
             {
-                gDisplay = std::make_unique<MipsDisplay>();
+                gDisplay = new MipsDisplay();
                 gDisplay->RunEngine();
             }
             return ErrorCode::Ok;
 
-        // 101 - Set Pixel a0=x, a1=y, a2=color
-        case 101:
+        case 101:  // Set Pixel
             if (gDisplay)
                 gDisplay->SetDisplayPixel(
                     regs[Register::a0],
@@ -34,27 +32,33 @@ ErrorCode handleSyscall(uint32_t* regs, void* mem, MemoryMap* mem_map)
                 );
             return ErrorCode::Ok;
 
-        // 102 - Refresh
-        case 102:
+        case 102:  // Refresh
             if (gDisplay)
                 gDisplay->Flush();
             return ErrorCode::Ok;
 
-        // 103 - Clear 
-        case 103:
+        case 103:  // Clear
             if (gDisplay)
                 gDisplay->ClearScreen(regs[Register::a0]);
             return ErrorCode::Ok;
 
-        // 104 - get key
-        case 104:
-            if (gDisplay)                regs[Register::v0] = gDisplay->GetLastKey();
-            return ErrorCode::Ok;
-        // 105 - Sleep
-        case 105:
-            if (gDisplay)                gDisplay->Sleep(regs[Register::a0]);
+        case 104:  // Get Key - SIMPLIFICADO: solo v0
+            if (gDisplay) {
+                regs[Register::v0] = gDisplay->GetLastKey();
+                // Pequeña pausa para no saturar la CPU
+                gDisplay->Sleep(5);
+            } else {
+                regs[Register::v0] = 0;
+            }
             return ErrorCode::Ok;
 
+        case 105:  // Exit Graphics
+            if (gDisplay)
+            {
+                gDisplay->StopEngine();
+            }
+            return ErrorCode::Ok;
+            
         default:
             return ErrorCode::SyscallNotImplemented;
     }
