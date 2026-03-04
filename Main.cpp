@@ -46,7 +46,14 @@ ErrorCode handleSyscall(uint32_t* regs, void* mem, MemoryMap* mem_map)
                 gDisplay->ClearScreen(regs[Register::a0]);
             return ErrorCode::Ok;
 
-        // 104 - S
+        // 104 - get key
+        case 104:
+            if (gDisplay)                regs[Register::v0] = gDisplay->GetLastKey();
+            return ErrorCode::Ok;
+        // 105 - Sleep
+        case 105:
+            if (gDisplay)                gDisplay->Sleep(regs[Register::a0]);
+            return ErrorCode::Ok;
 
         default:
             return ErrorCode::SyscallNotImplemented;
