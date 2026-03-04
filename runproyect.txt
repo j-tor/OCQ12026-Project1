@@ -1,0 +1,9 @@
+$ cd /c/Users/aleja/Documents/orga/OCQ12026-Project1/OCQ12026-Project1
+
+$ cmake -S . -B build -G "MinGW Makefiles"
+
+$ cmake --build build
+
+
+
+.\EasyMIPS.exe --sc-handler C:\Users\aleja\Documents\orga\OCQ12026-Project1\OCQ12026-Project1\build\libmips_display.dll --run C:\Users\aleja\Documents\orga\OCQ12026-Project1\OCQ12026-Project1\proyect.asm
