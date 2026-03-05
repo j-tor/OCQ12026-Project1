@@ -71,8 +71,7 @@ right:
 salir:
     li      $v0, 105        ; Exit graphics
     syscall
-    li      $v0, 10         ; Exit program
-    syscall
+    
 
 rect: ; a0:x, a1:y, a2:w, a3:h, 0($sp):color
     addi    $sp, $sp, -32
