@@ -1,6 +1,8 @@
 #include "easm.h"
 #include "MipsDisplay.hpp"
 #include <memory>
+#include <cstdlib>
+#include <iostream>
 
 static MipsDisplay* gDisplay = nullptr;
 
@@ -42,10 +44,10 @@ ErrorCode handleSyscall(uint32_t* regs, void* mem, MemoryMap* mem_map)
                 gDisplay->ClearScreen(regs[Register::a0]);
             return ErrorCode::Ok;
 
-        case 104:  // Get Key - SIMPLIFICADO: solo v0
+        case 104:  // Get Key
             if (gDisplay) {
                 regs[Register::v0] = gDisplay->GetLastKey();
-                // Pequeña pausa para no saturar la CPU
+                //  pausa para no saturar 
                 gDisplay->Sleep(5);
             } else {
                 regs[Register::v0] = 0;
@@ -56,6 +58,8 @@ ErrorCode handleSyscall(uint32_t* regs, void* mem, MemoryMap* mem_map)
             if (gDisplay)
             {
                 gDisplay->StopEngine();
+                delete gDisplay;
+                gDisplay = nullptr;
             }
             return ErrorCode::Ok;
             
