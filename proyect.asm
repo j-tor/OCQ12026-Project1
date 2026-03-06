@@ -25,6 +25,12 @@ loop:
     jal     rect
     addi    $sp, $sp, 4
 
+    li      $a0, 20         ; x1
+    li      $a1, 230        ; x2
+    li      $a2, 50         ; y
+    li      $a3, 0xFFFFFF   ; blanco
+    jal     draw_horizontal_line
+
     li      $v0, 102        ; Refresh
     syscall
 
@@ -122,4 +128,39 @@ re: lw      $s0, 0($sp)
     lw      $s6, 24($sp)
     lw      $ra, 28($sp)
     addi    $sp, $sp, 32
+    jr      $ra
+
+draw_horizontal_line: ; a0:x1, a1:x2, a2:y, a3:color
+    addi    $sp, $sp, -20
+    sw      $ra, 16($sp)
+    sw      $s0, 0($sp)
+    sw      $s1, 4($sp)
+    sw      $s2, 8($sp)
+    sw      $s3, 12($sp)
+
+    move    $s0, $a0        ; x1
+    move    $s1, $a1        ; x2
+    move    $s2, $a2        ; y
+    move    $s3, $a3        ; color
+
+line_lp:
+    slt     $t0, $s1, $s0   ; if x2 < x1, finish
+    bne     $t0, $zero, line_end
+    
+    li      $v0, 101        ; Set Pixel
+    move    $a0, $s0
+    move    $a1, $s2
+    move    $a2, $s3
+    syscall
+
+    addi    $s0, $s0, 1     ; x1++
+    j       line_lp
+
+line_end:
+    lw      $s0, 0($sp)
+    lw      $s1, 4($sp)
+    lw      $s2, 8($sp)
+    lw      $s3, 12($sp)
+    lw      $ra, 16($sp)
+    addi    $sp, $sp, 20
     jr      $ra
